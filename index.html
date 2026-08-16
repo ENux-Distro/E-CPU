@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>E-CPU 6502 Emulator</title>
+</head>
+
+<body>
+
+<h1>E-CPU 6502 Emulator</h1>
+
+<h4>Type in help to see all of the commands</h4>
+
+<pre id="output"></pre>
+
+<input
+    id="input"
+    type="text"
+    placeholder="Enter command..."
+    autofocus
+>
+
+<script type="module">
+
+import createCPU from "./6502.js";
+
+const Module = await createCPU();
+
+console.log("WASM loaded!");
+
+Module._cpu_init();
+
+console.log("CPU initialized!");
+
+const input = document.getElementById("input");
+const output = document.getElementById("output");
+
+function runCommand() {
+
+    const command = input.value;
+
+    if (command.trim() === "") {
+        return;
+    }
+
+    const result = Module.ccall(
+        "execute_command",
+        "string",
+        ["string"],
+        [command]
+    );
+
+    output.textContent += "> " + command + "\n";
+    output.textContent += result + "\n";
+
+    input.value = "";
+}
+
+input.addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+        runCommand();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
